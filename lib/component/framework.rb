@@ -96,7 +96,6 @@ module Component
       application.initializer :setup_component_sass, group: :all, after: :setup_sass do |app|
 
         require "component/framework/directive_processor"
-        require "component/framework/sass_importer"
 
         app.config.assets.configure do |sprockets_env|
           Component::Framework.log("Register assets directive processors")
@@ -106,9 +105,12 @@ module Component
           sprockets_env.register_preprocessor "application/javascript", Component::Framework::DirectiveProcessor
           sprockets_env.register_preprocessor "text/css", Component::Framework::DirectiveProcessor
 
-          Component::Framework.log("Add .scss `@import all-components` support")
-          sprockets_env.register_transformer "text/scss", "text/css", Component::Framework::ScssTemplate.new
-          sprockets_env.register_engine(".scss", Component::Framework::ScssTemplate, { silence_deprecation: true })
+          if Component::Framework.sass_present?
+            require "component/framework/sass_importer"
+            Component::Framework.log("Add .scss `@import all-components` support")
+            sprockets_env.register_transformer "text/scss", "text/css", Component::Framework::ScssTemplate.new
+            sprockets_env.register_engine(".scss", Component::Framework::ScssTemplate, { silence_deprecation: true })
+          end
         end
       end
     end
@@ -152,6 +154,11 @@ module Component
     def self._existing_component_subpaths(subpath)
       get_component_names.map { |component| components_base_dir.join(component, subpath).to_s }
           .select { |path| File.exists?(path) }
+    end
+
+
+    def self.sass_present?
+      defined?(SassC)
     end
 
 
