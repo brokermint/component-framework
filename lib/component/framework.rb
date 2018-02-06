@@ -15,7 +15,8 @@ module Component
     end
 
 
-    def self.initialize(application, assets_pipeline: true)
+    def self.initialize(application, assets_pipeline: true, verbose: false)
+      @verbose = verbose
 
       # patch Rails
       require "component/framework/railtie"
@@ -163,6 +164,8 @@ module Component
 
 
     def self.log(message)
+      return unless @verbose
+
       message = "[CF init] " + message
       if Rails.logger
         Rails.logger.info(message)
