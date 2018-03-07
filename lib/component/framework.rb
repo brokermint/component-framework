@@ -10,11 +10,19 @@ module Component
     end
 
 
+    # Components root folder path
+    #
+    # @return [string] Components root folder path
     def self.components_base_dir
       @base_dir ||= Rails.root.join("components")
     end
 
 
+    # Initialize Component Framework
+    #
+    # @param application [Rails::Application] the application class
+    # @param assets_pipeline [bool] specifies whether Sprockets asset_pipeline should be configured for components
+    # @param verbose [bool] allows to show components initialization log, default `false`
     def self.initialize(application, assets_pipeline: true, verbose: false)
       @verbose = verbose
 
@@ -42,15 +50,27 @@ module Component
         _initialize_assets_pipeline(application)
       end
 
-      # Initialize components after all initialization finished.
-      application.config.after_initialize do |app|
+      # Initialize components
+      #
+      # Initialization happen in 2 steps to allow components to perform actions upon initialized components.
+      # First cycle is a part of Rails initialization, so it's possible to configure Rails env in it
+      # like registering middleware etc.
+      application.initializer :initialize_components, group: :all do |app|
 
-        log("Load Components Initializers")
-        _load_components_initializers
+        Component::Framework.log("Load Components Initializers")
+        Component::Framework._load_components_initializers
 
-        components = get_component_modules
-        log("Initialize Components")
+        components = Component::Framework.get_component_modules
+        Component::Framework.log("Initialize Components")
         components.each {|component| component.send("init") if component.respond_to?("init") }
+      end
+
+      # Post initialization of components
+      # when all the other parts are ready to be referenced
+      #
+      # A place to register subscribers as well as call other component's services.
+      application.config.after_initialize do |app|
+        components = get_component_modules
 
         log("Post-Initialize Components")
         components.each {|component| component.send("ready") if component.respond_to?("ready") }
@@ -61,18 +81,27 @@ module Component
       log("Configuration Finished")
     end
 
-
+    # List of component names
+    #
+    # @return [Array<string>] List of component names
     def self.get_component_names
       Dir.entries(components_base_dir)
           .select { |entry| (entry !="." && entry != "..") and File.directory? components_base_dir.join(entry) }
     end
 
 
+    # List of component root modules
+    #
+    # @return [Array<Object>] List of component root modules
     def self.get_component_modules
       get_component_names.map { |name| component_module_by_name(name) }
     end
 
 
+    # Get the component root module by component name
+    #
+    # @param name [string] the component name
+    # @return [Object] Component root module
     def self.component_module_by_name(name)
       return name.camelize.constantize
     rescue NameError, ArgumentError

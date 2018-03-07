@@ -32,8 +32,19 @@ module My
     ...
   end
 
-  Component::Framework.initialize(YourApplication)
+  Component::Framework.initialize(My::Application)
+  
+end
 ```
+
+to get the components initialization output specify `verbose: true` parameter in framework initialization call
+
+in case you don't use Sprockets assets pipeline, you can explicitly disable it's configuration by specifying 
+`assets_pipeline: false` in framework initialization call
+
+e.g.
+`Component::Framework.initialize(My::Application, assets_pipeline: false, verbose: true)`
+
 
 ### Conventions
 
