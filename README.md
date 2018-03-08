@@ -54,14 +54,36 @@ e.g.
 
 ### Folder Structure
 
-/components/
-    <name>/
-        assets/
-            images/
-            javascripts/
-            stylesheets/
-        api/
-
+```
+app_root
+    /components
+        /<name>
+            /assets
+                /images
+                /javascripts
+                    myDialog.js
+                /stylesheets
+                    my-dialog.scss
+                /templates
+                    my-dialog.html
+            /migrations
+                20180102001234_create_task.rb
+            /test
+                
+            # custom folders
+            
+            /rest_api
+                /helpers
+                /views
+                /v1
+                    my_controller.rb
+                    routes.rb
+            /mailers        
+            /services
+            
+            initializer.rb
+            settings.rb
+```
 
 ### Components Initialization
 
@@ -74,7 +96,7 @@ e.g.
 
 ### Gemfile
 
-It's recommended to use `group :component_name` for gems required by particular component.
+It's recommended to use `group :default, :component_name` for gems required by particular component.
 
 
 ### Settings
@@ -94,7 +116,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/component-framework. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/brokermint/component-framework. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
