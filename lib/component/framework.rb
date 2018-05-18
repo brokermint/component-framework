@@ -86,7 +86,7 @@ module Component
     # @return [Array<string>] List of component names
     def self.get_component_names
       Dir.entries(components_base_dir)
-          .select { |entry| (entry !="." && entry != "..") and File.directory? components_base_dir.join(entry) }
+          .select { |entry| (entry !="." && entry != "..") and File.directory? components_base_dir.join(entry) }.sort
     end
 
 
