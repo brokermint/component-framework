@@ -8,6 +8,7 @@ class Rails::Application
       matcher = /\A#{Regexp.escape(load_path.to_s)}\/(.*)\.rb\Z/
       Dir.glob("#{load_path}/**/*.rb")
           .reject { |p| p.include?("/test/") }
+          .reject { |p| p.include?("/migrations/") }
           .sort.each do |file|
         require_dependency file.sub(matcher, '\1')
       end
