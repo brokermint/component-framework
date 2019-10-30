@@ -56,11 +56,7 @@ module Component
       # First cycle is a part of Rails initialization, so it's possible to configure Rails env in it
       # like registering middleware etc.
       application.initializer :initialize_components, group: :all do |app|
-
-        Component::Framework.log("Load Components Initializers")
-        Component::Framework._load_components_initializers
-
-        components = Component::Framework.get_component_modules
+        components = Component::Framework.get_component_modules(load_initializers: true)
         Component::Framework.log("Initialize Components")
         components.each {|component| component.send("init") if component.respond_to?("init") }
       end
@@ -91,9 +87,14 @@ module Component
 
 
     # List of component root modules
-    #
+    # @param load_initializers [bool] force component initialize.rb load
     # @return [Array<Object>] List of component root modules
-    def self.get_component_modules
+    def self.get_component_modules(load_initializers: false)
+      if load_initializers
+        Component::Framework.log("Load Components Initializers")
+        Component::Framework._load_components_initializers
+      end
+
       get_component_names.map { |name| component_module_by_name(name) }
     end
 
@@ -174,7 +175,7 @@ module Component
       # initializers are optional, so ignore the missing ones
       get_component_names.each do |name|
         begin
-          require_relative(components_base_dir.join("#{name}/initialize"))
+          require_dependency(components_base_dir.join("#{name}/initialize"))
         rescue LoadError
         end
       end
