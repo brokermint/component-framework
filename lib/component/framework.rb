@@ -176,7 +176,7 @@ module Component
 
     def self._get_component_routing_paths
       # All routes.rb files under /components folder
-      Dir.glob(components_base_dir.join("**/routes.rb")).sort
+      Dir.glob(components_base_dir.join("**/routes.rb"))
     end
 
 

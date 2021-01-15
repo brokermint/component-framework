@@ -10,7 +10,6 @@ class Component::Framework::DirectiveProcessor < Sprockets::DirectiveProcessor
 
     # gather component manifests with absolute paths.
     manifests_paths = Dir.glob(Component::Framework.components_base_dir.join("**/" + manifest_subpath))
-                         .select { |path| File.exist?(path) }
                          .sort # add predictability to require order
     
     manifests_paths.each { |path| @required << _resolve_absolute(path, accept: @content_type, pipeline: :self) }
