@@ -32,9 +32,7 @@ module Component::Framework
 
 
     def _component_manifest_files
-      Component::Framework.get_component_names
-          .map{ |component| Component::Framework.components_base_dir.join(component, "assets/stylesheets/app.scss").to_s }
-          .select { |path| File.exists?(path) }
+      Dir.glob(Component::Framework.components_base_dir.join("**/assets/stylesheets/app.scss")).sort
     end
 
   end

@@ -9,11 +9,9 @@ class Component::Framework::DirectiveProcessor < Sprockets::DirectiveProcessor
   def process_require_components_directive(manifest_subpath = "assets/javascripts/app.js")
 
     # gather component manifests with absolute paths.
-    manifests_paths = Component::Framework.get_component_names
-                          .map {|name| Component::Framework.components_base_dir.join(name, manifest_subpath).to_s}
-                          .select { |path| File.exist?(path) }
-                          .sort  # add predictability to require order
-
+    manifests_paths = Dir.glob(Component::Framework.components_base_dir.join("**/" + manifest_subpath))
+                         .sort # add predictability to require order
+    
     manifests_paths.each { |path| @required << _resolve_absolute(path, accept: @content_type, pipeline: :self) }
   end
 
