@@ -34,6 +34,7 @@ module Component::Framework
     def _component_manifest_files
       Dir.glob(Component::Framework.components_base_dir.join("**/assets/stylesheets/app.scss"))
          .select { |path| File.exist?(path) }
+         .sort
     end
 
   end

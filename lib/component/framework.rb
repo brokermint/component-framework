@@ -162,13 +162,13 @@ module Component
     def self._get_component_assets_paths
 
       # All stylesheets paths under /components folder
-      styles = Dir.glob(components_base_dir.join("**/assets/stylesheets"))
+      styles = Dir.glob(components_base_dir.join("**/assets/stylesheets")).sort
 
       # All javascripts paths under /components folder
-      scripts = Dir.glob(components_base_dir.join("**/assets/javascripts"))
+      scripts = Dir.glob(components_base_dir.join("**/assets/javascripts")).sort
 
       # All images paths under /components folder
-      images = Dir.glob(components_base_dir.join("**/assets/images"))
+      images = Dir.glob(components_base_dir.join("**/assets/images")).sort
 
       return styles + scripts + images
     end
@@ -176,7 +176,7 @@ module Component
 
     def self._get_component_routing_paths
       # All routes.rb files under /components folder
-      Dir.glob(components_base_dir.join("**/routes.rb"))
+      Dir.glob(components_base_dir.join("**/routes.rb")).sort
     end
 
 
