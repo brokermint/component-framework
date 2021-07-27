@@ -146,19 +146,28 @@ module Component
 
 
     def self._get_component_migrations_paths
-      _existing_component_subpaths("migrations")
+      # All migrations paths under /components folder
+      Dir.glob(components_base_dir.join("**/migrations"))
     end
 
 
     def self._get_component_helpers_paths
-      _existing_component_subpaths("api/helpers")
+      # All helpers paths under /components folder
+      Dir.glob(components_base_dir.join("**/helpers"))
     end
 
 
     def self._get_component_assets_paths
-      styles = _existing_component_subpaths("assets/stylesheets")
-      scripts = _existing_component_subpaths("assets/javascripts")
-      images = _existing_component_subpaths("assets/images")
+
+      # All stylesheets paths under /components folder
+      styles = Dir.glob(components_base_dir.join("**/assets/stylesheets")).sort
+
+      # All javascripts paths under /components folder
+      scripts = Dir.glob(components_base_dir.join("**/assets/javascripts")).sort
+
+      # All images paths under /components folder
+      images = Dir.glob(components_base_dir.join("**/assets/images")).sort
+
       return styles + scripts + images
     end
 
@@ -177,12 +186,6 @@ module Component
         rescue LoadError
         end
       end
-    end
-
-
-    def self._existing_component_subpaths(subpath)
-      get_component_names.map { |component| components_base_dir.join(component, subpath).to_s }
-          .select { |path| File.exists?(path) }
     end
 
 
