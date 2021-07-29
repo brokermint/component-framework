@@ -4,12 +4,6 @@ require "component/settings"
 module Component
   module Framework
 
-    COMPONENT_IMAGE_ASSETS = lambda do |logical_path, filename|
-      filename.start_with?(components_base_dir.to_s) &&
-          %w(.png .jpg .jpeg .gif).include?(File.extname(logical_path))
-    end
-
-
     # Components root folder path
     #
     # @return [string] Components root folder path
@@ -119,7 +113,6 @@ module Component
 
       log("Register Components Assets")
       application.config.assets.paths += _get_component_assets_paths
-      application.config.assets.precompile += [COMPONENT_IMAGE_ASSETS]
 
 
       # We need to override SassC configuration
@@ -140,7 +133,12 @@ module Component
             require "component/framework/sass_importer"
             Component::Framework.log("Add .scss `@import all-components` support")
             sprockets_env.register_transformer "text/scss", "text/css", Component::Framework::ScssTemplate.new
-            sprockets_env.register_engine(".scss", Component::Framework::ScssTemplate, { silence_deprecation: true })
+            if sprockets_env.respond_to?(:register_engine)
+              sprockets_env.register_engine(".scss", Component::Framework::ScssTemplate, { silence_deprecation: true })
+            else
+              sprockets_env.register_mime_type "text/scss", extensions: [".scss"], charset: :css
+              sprockets_env.register_preprocessor "text/scss", Component::Framework::ScssTemplate
+            end
           end
         end
       end
@@ -148,19 +146,28 @@ module Component
 
 
     def self._get_component_migrations_paths
-      _existing_component_subpaths("migrations")
+      # All migrations paths under /components folder
+      Dir.glob(components_base_dir.join("**/migrations"))
     end
 
 
     def self._get_component_helpers_paths
-      _existing_component_subpaths("api/helpers")
+      # All helpers paths under /components folder
+      Dir.glob(components_base_dir.join("**/helpers"))
     end
 
 
     def self._get_component_assets_paths
-      styles = _existing_component_subpaths("assets/stylesheets")
-      scripts = _existing_component_subpaths("assets/javascripts")
-      images = _existing_component_subpaths("assets/images")
+
+      # All stylesheets paths under /components folder
+      styles = Dir.glob(components_base_dir.join("**/assets/stylesheets")).sort
+
+      # All javascripts paths under /components folder
+      scripts = Dir.glob(components_base_dir.join("**/assets/javascripts")).sort
+
+      # All images paths under /components folder
+      images = Dir.glob(components_base_dir.join("**/assets/images")).sort
+
       return styles + scripts + images
     end
 
@@ -179,12 +186,6 @@ module Component
         rescue LoadError
         end
       end
-    end
-
-
-    def self._existing_component_subpaths(subpath)
-      get_component_names.map { |component| components_base_dir.join(component, subpath).to_s }
-          .select { |path| File.exists?(path) }
     end
 
 
