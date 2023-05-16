@@ -19,9 +19,9 @@ class Component::Framework::DirectiveProcessor < Sprockets::DirectiveProcessor
   private
 
 
-  def _resolve_absolute(path, options = {})
+  def _resolve_absolute(path, accept:, pipeline:)
     # adapted from Sprockets::DirectiveProcessor.resolve
-    uri, deps = @environment.resolve!(path, options.merge(base_path: @dirname))
+    uri, deps = @environment.resolve!(path, accept: accept, pipeline: pipeline, base_path: @dirname)
     @dependencies.merge(deps)
     uri
   end

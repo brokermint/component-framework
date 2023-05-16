@@ -36,7 +36,11 @@ module Component
 
       if yaml_file.exist?
         require "erb"
-        yaml = (YAML.load(ERB.new(yaml_file.read).result) || {})
+
+        processed_yaml = ERB.new(yaml_file.read).result
+        # Psych v4+ defaulted .load to safe_load and break aliases support in config files
+        yaml = YAML.respond_to?(:unsafe_load) ? YAML.unsafe_load(processed_yaml) : YAML.load(processed_yaml)
+        yaml ||= {}
 
         result = yaml.map { |k, v| [k, v[env] || {}] }.to_h
 
